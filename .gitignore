@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea/*
+NetFlow-v1-Datasets/*
