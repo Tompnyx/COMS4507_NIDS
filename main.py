@@ -133,7 +133,7 @@ if args.supervised:
     print('\nClassifying with a k-nearest neighbour implementation')
     knn = run_model(KNeighborsClassifier(n_jobs=16))
     print('\nClassifying with a Support Vector Classifier implementation')
-    svc = run_model(SVC(kernel='poly', verbose=1))
+    svc = run_model(SVC(kernel='rbf', verbose=1, tol=0.01, max_iter=20))
     algorithms = ['RF', 'kNN', 'SVC']
 else:
     # Anomaly detection methods
