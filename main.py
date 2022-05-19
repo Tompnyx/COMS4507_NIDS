@@ -33,11 +33,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('dataset_dir', type=str, help='csv file containing the NetFlow-based dataset')
 parser.add_argument('out_dir', type=str, help='Output directory')
 parser.add_argument('--ext', type=str, default='.csv', help='The filename extension (default: .csv)')
-parser.add_argument('--supervised', action=argparse.BooleanOptionalAction, default=True, help='Perform traffic '
-                                                                                              'classification ('
-                                                                                              'supervised)')
-parser.add_argument('--unsupervised', dest='supervised', action='store_false', help='Perform anomaly detection ('
-                                                                                    'un-supervised)')
+parser.add_argument('--classification', action=argparse.BooleanOptionalAction, default=True, help='Perform traffic '
+                                                                                                  'classification')
+parser.add_argument('--anomaly', dest='classification', action='store_false', help='Perform anomaly detection')
 parser.add_argument('--show_heatmap', action=argparse.BooleanOptionalAction,
                     help='Whether to calculate and show a heatmap of the features')
 parser.add_argument('--show_comparisons', action=argparse.BooleanOptionalAction,
@@ -61,8 +59,8 @@ print('\nShape of the dataset: ', nf_dataset.shape)
 
 # Create the feature and label subsets
 nf_features = nf_dataset.copy()
-nf_labels_supervised = nf_features.pop('Attack')
-nf_labels_unsupervised = nf_features.pop('Label')
+nf_labels_classification = nf_features.pop('Attack')
+nf_labels_anomaly = nf_features.pop('Label')
 print('List of null values in each feature: \n', nf_features.isnull().sum())
 
 # Plot a heatmap of feature correlations
@@ -83,26 +81,27 @@ nf_features['IPV4_DST_ADDR'] = le_dst.transform(nf_features['IPV4_DST_ADDR'])
 
 # # Convert to numpy array
 # nf_features = np.array(nf_features)
-# nf_labels_supervised = np.array(nf_labels_supervised)
-# nf_labels_unsupervised = np.array(nf_labels_unsupervised)
+# nf_labels_classification = np.array(nf_labels_classification)
+# nf_labels_anomaly = np.array(nf_labels_anomaly)
 # print("Shape of the features: ", nf_features.shape)
 
 # Normalise the features
 sc = preprocessing.MinMaxScaler()
 nf_features = sc.fit_transform(nf_features)
 
-if args.supervised:
+if args.classification:
     x_train, x_test, y_train, y_test = model_selection.train_test_split(nf_features,
-                                                                        nf_labels_supervised,
+                                                                        nf_labels_classification,
                                                                         test_size=args.test_split,
                                                                         random_state=args.seed)
 else:
     x_train, x_test, y_train, y_test = model_selection.train_test_split(nf_features,
-                                                                        nf_labels_unsupervised,
+                                                                        nf_labels_anomaly,
                                                                         test_size=args.test_split,
                                                                         random_state=args.seed)
 print('\nShape of the training dataset: ', x_train.shape, y_train.shape)
 print('Shape of the testing dataset: ', x_test.shape, y_test.shape)
+
 
 # 3. Initialise and create the machine learning techniques
 
@@ -126,7 +125,7 @@ def run_model(model):
     return y_test_pred, test_end_time, model.score(x_train, y_train), train_end_time, model.score(x_test, y_test)
 
 
-if args.supervised:
+if args.classification:
     # Traffic classification methods
     print('\nClassifying with a Random Forest implementation')
     rf = run_model(RandomForestClassifier(max_depth=4, verbose=1, n_jobs=16))
@@ -145,11 +144,12 @@ else:
     lr = run_model(LogisticRegression(max_iter=1200, verbose=1, n_jobs=16))
     algorithms = ['GNB', 'DT', 'LR']
 
+
 # 4. Evaluate the performances of each algorithm
 
 
 def compare_models(metric, value_index):
-    if args.supervised:
+    if args.classification:
         values = [rf[value_index], knn[value_index], svc[value_index]]
     else:
         values = [gnb[value_index], dt[value_index], lr[value_index]]
