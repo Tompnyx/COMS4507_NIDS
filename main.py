@@ -7,10 +7,10 @@ numpy = 1.21.4
 pandas = 1.3.5
 python = 3.9.7
 seaborn = 0.11.2
-scikit-learn - 1.0.1
+scikit-learn = 1.0.1
 """
 
-__author__ = "tompnyx"
+__author__ = "Tompnyx"
 __version__ = "1.0.0"
 
 import argparse
