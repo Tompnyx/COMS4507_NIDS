@@ -14,7 +14,7 @@ To run the program, main.py should be run. However, two conditions must be met: 
 
 For example:
 ```commandline
-python3 .\main.py .\COMS4507_NIDS\NetFlow-v1-Datasets\NF-CSE-CIC-IDS2018.csv .\COMS4507\COMS4507_NIDS\Output --anomaly --show_heatmap --show_comparisons
+python3 .\main.py .\NetFlow-v1-Datasets\NF-CSE-CIC-IDS2018.csv .\Output --anomaly --show_heatmap --show_comparisons
 ```
 ### Dataset Description
 The dataset used for training and testing was the NF-CSE-CIC-IDS2018 dataset, which is a generated NetFlow-based dataset. The dataset has 8,392,401 flows, of which 1,019.203 or (12.4%) are attack samples. These attack samples include:
